@@ -376,7 +376,7 @@ Esse comando valida a coleta de métricas de CPU e memória dos pods.
 - Validação técnica com `kubectl get`, `kubectl describe`, `kubectl top` e testes de DNS interno
 - Noções de governança de recursos para ambientes compartilhados
 - Qualidade de comunicação técnica em documentação profissional
-- Uso de GitHub Actions, Pull Requests, Makefile e documentação auxiliar
+- Uso de GitHub Actions, Pull Requests, Makefile e documentação auxiliar 
 
 ## Evidências visuais do laboratório
 
