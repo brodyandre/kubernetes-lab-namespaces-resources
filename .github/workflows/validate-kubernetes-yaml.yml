@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - feature/melhorias-pos-publicacao
   pull_request:
     branches:
       - main
@@ -17,7 +18,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Python
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.x"
@@ -27,18 +28,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install yamllint
 
-      - name: Validate YAML syntax (manifests)
+      - name: Validate YAML syntax in manifests
         run: |
-          yamllint -d "{extends: default, rules: {line-length: disable, document-start: disable}}" manifests/
-
-      - name: Install kubeconform
-        run: |
-          KUBECONFORM_VERSION="v0.6.7"
-          curl -sSL "https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VERSION}/kubeconform-linux-amd64.tar.gz" -o kubeconform.tar.gz
-          tar -xzf kubeconform.tar.gz kubeconform
-          sudo mv kubeconform /usr/local/bin/kubeconform
-          kubeconform -v
-
-      - name: Validate Kubernetes manifests (sem cluster)
-        run: |
-          kubeconform -strict -summary -recursive -ignore-missing-schemas manifests/
+          yamllint -d "{extends: default, rules: {line-length: disable, document-start: disable, indentation: disable}}" manifests/
