@@ -10,7 +10,7 @@
 ![Cloud Native](https://img.shields.io/badge/Cloud%20Native-146EF5?style=for-the-badge&logo=icloud&logoColor=white)
 ![Data Engineering](https://img.shields.io/badge/Data%20Engineering-0B3D91?style=for-the-badge)
 
-> ✅ Projeto executado e validado na prática no cluster `kind-lab-ns-res` (WSL2 + Windows 11), com evidências de DNS entre namespaces, QoS, LimitRange, ResourceQuota e métricas de pods.
+> ✅ Projeto executado e validado na prática no cluster `kind-lab-ns-res` usando WSL2 no Windows 11, com evidências de DNS entre namespaces, QoS, LimitRange, ResourceQuota e métricas de pods.
 
 ## Stack validada no laboratório
 
@@ -34,10 +34,11 @@ Muitos profissionais aprendem Kubernetes apenas no nível conceitual e não cheg
 
 Este laboratório resolve essa lacuna com cenários executáveis, comandos diretos, YAMLs prontos para uso e validações técnicas observáveis:
 
-- isolamento por namespaces
-- comunicação entre serviços via DNS interno
-- governança de CPU/memória com requests, limits, LimitRange e ResourceQuota
-- validação de QoS e métricas operacionais
+- isolamento por namespaces;
+- comunicação entre serviços via DNS interno;
+- governança de CPU/memória com requests, limits, LimitRange e ResourceQuota;
+- validação de QoS e métricas operacionais;
+- organização profissional de documentação e automação.
 
 Com isso, o projeto demonstra capacidade de implementação, validação e troubleshooting em cluster Kubernetes local, com práticas que se conectam ao contexto de times e ambientes corporativos.
 
@@ -75,7 +76,7 @@ flowchart LR
 - Ubuntu 22.04
 - Docker
 - `kubectl`
-- `k3d` ou `kind` ou `minikube`
+- `k3d`, `kind` ou `minikube`
 - VS Code
 - Git
 - GitHub
@@ -90,7 +91,17 @@ chmod +x scripts/*.sh
 ./scripts/cleanup.sh
 ```
 
-Observação: se você quiser forçar o provisionador no setup, use `./scripts/setup.sh kind` ou `./scripts/setup.sh k3d`.
+Observação: se você quiser forçar o provisionador no setup, use:
+
+```bash
+./scripts/setup.sh kind
+```
+
+ou:
+
+```bash
+./scripts/setup.sh k3d
+```
 
 ## Executando com Makefile
 
@@ -110,19 +121,20 @@ make limitrange
 make cleanup
 ```
 
-Observação: `make apply` (scripts/apply-all.sh) não aplica automaticamente os manifestos didáticos que geram erro proposital:
+Observação: `make apply` não aplica automaticamente os manifestos didáticos que geram erro proposital:
 
 - `manifests/limitrange/pod-above-limit.yaml`
 - `manifests/resourcequota/deployment-exceed-quota.yaml`
 
+Esses arquivos existem para demonstrar, de forma controlada, como o Kubernetes bloqueia recursos que violam políticas de `LimitRange` ou `ResourceQuota`.
+
 ## Qualidade e validação automática
 
-Este projeto possui GitHub Actions para validar os manifests Kubernetes a cada alteração em `main` (push e pull request), sem depender de cluster externo.
+Este projeto possui GitHub Actions para validar os manifests Kubernetes a cada alteração em `main` via push ou pull request, sem depender de cluster externo.
 
-Validações aplicadas automaticamente:
+Validação aplicada automaticamente:
 
-- sintaxe YAML dos arquivos em `manifests/` com `yamllint`
-- estrutura de manifests Kubernetes com `kubeconform` (validação offline)
+- sintaxe YAML dos arquivos em `manifests/` com `yamllint`.
 
 Workflow:
 
@@ -130,10 +142,16 @@ Workflow:
 
 Templates de colaboração no GitHub:
 
-- Issues: `.github/ISSUE_TEMPLATE/bug_report.md`, `.github/ISSUE_TEMPLATE/melhoria.md`, `.github/ISSUE_TEMPLATE/pergunta.md`
-- Pull requests: `.github/pull_request_template.md`
-- Guia de contribuição: [CONTRIBUTING.md](CONTRIBUTING.md)
-- Histórico de mudanças: [CHANGELOG.md](CHANGELOG.md)
+- Issues:
+  - `.github/ISSUE_TEMPLATE/bug_report.md`
+  - `.github/ISSUE_TEMPLATE/melhoria.md`
+  - `.github/ISSUE_TEMPLATE/pergunta.md`
+- Pull requests:
+  - `.github/pull_request_template.md`
+- Guia de contribuição:
+  - [CONTRIBUTING.md](CONTRIBUTING.md)
+- Histórico de mudanças:
+  - [CHANGELOG.md](CHANGELOG.md)
 
 ## Roadmap
 
@@ -154,7 +172,7 @@ Para acompanhar a evolução futura do laboratório, consulte o roadmap do proje
 - [Roteiro de estudo](#roteiro-de-estudo)
 - [Evidências práticas de execução](#evidências-práticas-de-execução)
 - [O que um recrutador técnico avalia aqui](#o-que-um-recrutador-técnico-avalia-aqui)
-- [Screenshots do laboratório](#screenshots-do-laboratório)
+- [Evidências visuais do laboratório](#evidências-visuais-do-laboratório)
 - [Próximos passos](#próximos-passos)
 
 ## Estrutura do repositório
@@ -289,7 +307,9 @@ kubectl exec -n frontend -it frontend-client -- curl backend-api.backend.svc.clu
 
 Fluxo técnico:
 
-`frontend-client` -> `backend-api.backend.svc.cluster.local` -> Service `backend-api` -> Pod NGINX no namespace `backend`
+```text
+frontend-client -> backend-api.backend.svc.cluster.local -> Service backend-api -> Pod NGINX no namespace backend
+```
 
 Resultado observado:
 
@@ -297,11 +317,11 @@ Resultado observado:
 
 Esse retorno confirma:
 
-- Service discovery funcionando
-- DNS interno funcionando
-- Comunicação entre namespaces funcionando
-- Service ClusterIP funcionando
-- Pod backend respondendo corretamente
+- Service discovery funcionando;
+- DNS interno funcionando;
+- comunicação entre namespaces funcionando;
+- Service ClusterIP funcionando;
+- Pod backend respondendo corretamente.
 
 ### 4. Validação de QoS
 
@@ -321,9 +341,9 @@ Resultados esperados:
 
 Resumo técnico:
 
-- `Guaranteed`: requests e limits iguais
-- `Burstable`: requests e limits definidos, mas diferentes
-- `BestEffort`: sem requests e sem limits
+- `Guaranteed`: requests e limits iguais;
+- `Burstable`: requests e limits definidos, mas diferentes;
+- `BestEffort`: sem requests e sem limits.
 
 ### 5. ResourceQuota e LimitRange
 
@@ -356,56 +376,61 @@ Esse comando valida a coleta de métricas de CPU e memória dos pods.
 - Validação técnica com `kubectl get`, `kubectl describe`, `kubectl top` e testes de DNS interno
 - Noções de governança de recursos para ambientes compartilhados
 - Qualidade de comunicação técnica em documentação profissional
+- Uso de GitHub Actions, Pull Requests, Makefile e documentação auxiliar
 
-## Screenshots do laboratório
+## Evidências visuais do laboratório
 
-Adicione capturas reais de execução na pasta `assets/screenshots/` para comprovar, visualmente, que o laboratório foi aplicado e validado na prática.
+Esta seção documenta as capturas recomendadas para comprovar visualmente a execução prática do laboratório Kubernetes.
+
+As evidências devem ser geradas a partir de comandos executados localmente no cluster `kind-lab-ns-res` e salvas na pasta:
+
+```bash
+assets/screenshots/
+```
+
+> Observação: as imagens ainda não foram adicionadas ao repositório. Por isso, esta seção lista os prints recomendados sem renderizar imagens quebradas no GitHub.
 
 | Evidência | Comando | Arquivo sugerido | O que comprova |
 |---|---|---|---|
 | Namespaces criados | `kubectl get namespaces` | `01-namespaces.png` | Separação lógica de ambientes e laboratórios no cluster |
 | Pods em execução | `kubectl get pods -A` | `02-pods-running.png` | Workloads ativos em múltiplos namespaces |
-| Services ativos | `kubectl get svc -A` | `03-services.png` | Exposição interna de serviços e descoberta por DNS |
-| Quotas por namespace | `kubectl get resourcequota -A` | `04-resourcequota.png` | Políticas de consumo de recursos aplicadas |
-| Limites padrão por namespace | `kubectl get limitrange -A` | `05-limitrange.png` | Padrões mínimos e máximos de CPU/memória configurados |
-| Métricas de recursos | `kubectl top pods -A` | `06-metrics-server.png` | Metrics Server funcional e leitura de CPU/memória |
-| DNS entre namespaces (execução prática) | `kubectl exec -n frontend -it frontend-client -- curl backend-api.backend.svc.cluster.local` | `07-dns-cross-namespace.png` | Comunicação `frontend` -> `backend` via DNS interno (`service.namespace.svc.cluster.local`) |
-| Detalhes da ResourceQuota | `kubectl describe quota -n quota-lab` | `04-resourcequota.png` | Limites e consumo atual de CPU/memória/objetos no namespace |
-| Detalhes do LimitRange | `kubectl describe limitrange -n limitrange-lab` | `05-limitrange.png` | Defaults, mínimos e máximos aplicados aos containers |
-| Estrutura do projeto no editor | N/A (captura no VS Code) | `08-vscode-estrutura-projeto.png` | Organização profissional do repositório |
-| README renderizado no GitHub | N/A (captura no navegador) | `09-github-readme.png` | Qualidade de documentação para recrutadores e comunidade |
+| Services ativos | `kubectl get svc -A` | `03-services.png` | Exposição interna de services e descoberta via DNS |
+| ResourceQuota aplicada | `kubectl get resourcequota -A` | `04-resourcequota.png` | Políticas de consumo de recursos aplicadas por namespace |
+| LimitRange aplicada | `kubectl get limitrange -A` | `05-limitrange.png` | Padrões mínimos, máximos e valores default para containers |
+| Metrics Server | `kubectl top pods -A` | `06-metrics-server.png` | Coleta de métricas de CPU e memória dos pods |
+| Comunicação DNS entre namespaces | `make dns-test` | `07-dns-cross-namespace.png` | Comunicação entre `frontend` e `backend` via DNS interno |
+| Estrutura no VS Code | Captura da estrutura do projeto | `08-vscode-estrutura-projeto.png` | Organização profissional do repositório |
+| README no GitHub | Captura do README renderizado | `09-github-readme.png` | Apresentação visual do projeto para recrutadores |
 
-Importante:
+### Como adicionar os screenshots
 
-- Não invente imagens.
-- Não crie arquivos PNG falsos.
-- Salve apenas prints reais da execução em `assets/screenshots/`.
+Após executar o laboratório localmente, salve os prints reais na pasta:
 
-As imagens abaixo devem ser adicionadas após a execução local do laboratório.
+```bash
+assets/screenshots/
+```
 
+Use os nomes sugeridos na tabela acima.
+
+Depois, adicione e envie as imagens para o GitHub:
+
+```bash
+git add assets/screenshots/
+git commit -m "docs: add laboratory screenshots"
+git push origin main
+```
+
+### Galeria futura
+
+Quando os arquivos `.png` forem adicionados ao repositório, esta seção poderá ser atualizada para exibir a galeria visual diretamente no README.
+
+Exemplo:
+
+```markdown
 ### Namespaces criados
+
 ![Namespaces criados](assets/screenshots/01-namespaces.png)
-
-### Pods em execução
-![Pods em execução](assets/screenshots/02-pods-running.png)
-
-### Services criados
-![Services criados](assets/screenshots/03-services.png)
-
-### ResourceQuota aplicada
-![ResourceQuota aplicada](assets/screenshots/04-resourcequota.png)
-
-### LimitRange aplicada
-![LimitRange aplicada](assets/screenshots/05-limitrange.png)
-
-### Metrics Server coletando métricas
-![Metrics Server](assets/screenshots/06-metrics-server.png)
-
-### Comunicação DNS entre namespaces
-![DNS entre namespaces](assets/screenshots/07-dns-cross-namespace.png)
-
-### Estrutura do projeto no VS Code
-![Estrutura no VS Code](assets/screenshots/08-vscode-estrutura-projeto.png)
+```
 
 ## Aprendizados demonstrados para recrutadores
 
@@ -417,6 +442,8 @@ Este projeto demonstra:
 - Troubleshooting
 - Documentação profissional
 - Clareza de comunicação
+- Versionamento com Git e GitHub
+- Uso de Pull Requests e validação automática
 
 ## Próximos passos
 
@@ -426,6 +453,10 @@ Este projeto demonstra:
 - Secrets avançados
 - Deploy de aplicação real
 - CI/CD com GitHub Actions
+- RBAC
+- NetworkPolicies
+- Jobs e CronJobs
+- Aplicações de dados em Kubernetes
 
 ## Autor
 
