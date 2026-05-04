@@ -1,81 +1,87 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
-set -e
+SCRIPT_NAME="apply"
 
-echo "[apply] Iniciando aplicação dos manifests..."
+log() {
+  echo "[${SCRIPT_NAME}] $*"
+}
 
-echo "[apply] ----------------------------------------"
-echo "[apply] Etapa 1: Criando namespaces principais"
+error() {
+  echo "[${SCRIPT_NAME}] ERRO: $*" >&2
+}
 
-kubectl apply -f manifests/namespaces/namespace-dev.yaml
-kubectl apply -f manifests/namespaces/namespace-staging.yaml
-kubectl apply -f manifests/namespaces/namespace-prod.yaml
+warn() {
+  echo "[${SCRIPT_NAME}] ALERTA: $*"
+}
 
-if [ -f manifests/namespaces/namespace-qa.yaml ]; then
-  kubectl apply -f manifests/namespaces/namespace-qa.yaml
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+cd "${REPO_ROOT}"
+
+apply_if_exists() {
+  local file="$1"
+  if [[ -f "${file}" ]]; then
+    log "Aplicando: ${file}"
+    kubectl apply -f "${file}"
+  else
+    warn "Arquivo não encontrado (etapa ignorada): ${file}"
+  fi
+}
+
+if ! command -v kubectl >/dev/null 2>&1; then
+  error "kubectl não encontrado no PATH."
+  exit 1
 fi
 
-if [ -f manifests/namespaces/namespace-shared.yaml ]; then
-  kubectl apply -f manifests/namespaces/namespace-shared.yaml
+if ! kubectl cluster-info >/dev/null 2>&1; then
+  error "não foi possível acessar o cluster Kubernetes no contexto atual."
+  exit 1
 fi
 
-kubectl apply -f manifests/dns-cross-namespace/backend-namespace.yaml
-kubectl apply -f manifests/dns-cross-namespace/frontend-namespace.yaml
+log "Iniciando aplicação dos manifests do laboratório..."
 
-if [ -f manifests/qos/namespace-qos.yaml ]; then
-  kubectl apply -f manifests/qos/namespace-qos.yaml
-fi
+log "Etapa 1/7: Criando namespaces (sempre antes dos objetos)"
+apply_if_exists "manifests/namespaces/namespace-dev.yaml"
+apply_if_exists "manifests/namespaces/namespace-staging.yaml"
+apply_if_exists "manifests/namespaces/namespace-prod.yaml"
+apply_if_exists "manifests/namespaces/namespace-qa.yaml"
+apply_if_exists "manifests/namespaces/namespace-shared.yaml"
+apply_if_exists "manifests/dns-cross-namespace/backend-namespace.yaml"
+apply_if_exists "manifests/dns-cross-namespace/frontend-namespace.yaml"
+apply_if_exists "manifests/qos/namespace-qos.yaml"
+apply_if_exists "manifests/limitrange/namespace-limitrange.yaml"
+apply_if_exists "manifests/resourcequota/namespace-quota.yaml"
 
-if [ -f manifests/limitrange/namespace-limitrange.yaml ]; then
-  kubectl apply -f manifests/limitrange/namespace-limitrange.yaml
-fi
+log "Etapa 2/7: Aplicando objetos do namespace dev"
+apply_if_exists "manifests/namespaces/app-dev.yaml"
+apply_if_exists "manifests/namespaces/service-dev.yaml"
 
-if [ -f manifests/resourcequota/namespace-quota.yaml ]; then
-  kubectl apply -f manifests/resourcequota/namespace-quota.yaml
-fi
+log "Etapa 3/7: Aplicando laboratório de DNS entre namespaces"
+apply_if_exists "manifests/dns-cross-namespace/backend-deployment.yaml"
+apply_if_exists "manifests/dns-cross-namespace/backend-service.yaml"
+apply_if_exists "manifests/dns-cross-namespace/frontend-pod.yaml"
 
-echo "[apply] ----------------------------------------"
-echo "[apply] Etapa 2: Aplicando objetos do namespace dev"
+log "Etapa 4/7: Aplicando laboratório de resources, requests e limits"
+log "Observação: o manifesto app-with-requests-limits.yaml já inclui a criação do namespace resources-lab."
+apply_if_exists "manifests/resources/app-with-requests-limits.yaml"
+apply_if_exists "manifests/resources/stress-pod.yaml"
 
-kubectl apply -f manifests/namespaces/app-dev.yaml
-kubectl apply -f manifests/namespaces/service-dev.yaml
+log "Etapa 5/7: Aplicando laboratório de QoS"
+apply_if_exists "manifests/qos/pod-guaranteed.yaml"
+apply_if_exists "manifests/qos/pod-burstable.yaml"
+apply_if_exists "manifests/qos/pod-besteffort.yaml"
 
-echo "[apply] ----------------------------------------"
-echo "[apply] Etapa 3: Aplicando laboratório de DNS entre namespaces"
+log "Etapa 6/7: Aplicando laboratório de LimitRange"
+apply_if_exists "manifests/limitrange/limitrange-default.yaml"
+apply_if_exists "manifests/limitrange/limitrange-min-max.yaml"
+apply_if_exists "manifests/limitrange/pod-without-resources.yaml"
+log "Arquivo didático não aplicado automaticamente: manifests/limitrange/pod-above-limit.yaml"
 
-kubectl apply -f manifests/dns-cross-namespace/backend-deployment.yaml
-kubectl apply -f manifests/dns-cross-namespace/backend-service.yaml
-kubectl apply -f manifests/dns-cross-namespace/frontend-pod.yaml
+log "Etapa 7/7: Aplicando laboratório de ResourceQuota"
+apply_if_exists "manifests/resourcequota/resourcequota-compute.yaml"
+apply_if_exists "manifests/resourcequota/resourcequota-objects.yaml"
+apply_if_exists "manifests/resourcequota/deployment-with-quota.yaml"
+log "Arquivo didático não aplicado automaticamente: manifests/resourcequota/deployment-exceed-quota.yaml"
 
-echo "[apply] ----------------------------------------"
-echo "[apply] Etapa 4: Aplicando laboratório de Resources, Requests e Limits"
-
-kubectl apply -f manifests/resources/app-with-requests-limits.yaml
-
-if [ -f manifests/resources/stress-pod.yaml ]; then
-  kubectl apply -f manifests/resources/stress-pod.yaml
-fi
-
-echo "[apply] ----------------------------------------"
-echo "[apply] Etapa 5: Aplicando laboratório de QoS"
-
-kubectl apply -f manifests/qos/pod-guaranteed.yaml
-kubectl apply -f manifests/qos/pod-burstable.yaml
-kubectl apply -f manifests/qos/pod-besteffort.yaml
-
-echo "[apply] ----------------------------------------"
-echo "[apply] Etapa 6: Aplicando laboratório de LimitRange"
-
-kubectl apply -f manifests/limitrange/limitrange-default.yaml
-kubectl apply -f manifests/limitrange/limitrange-min-max.yaml
-kubectl apply -f manifests/limitrange/pod-without-resources.yaml
-
-echo "[apply] ----------------------------------------"
-echo "[apply] Etapa 7: Aplicando laboratório de ResourceQuota"
-
-kubectl apply -f manifests/resourcequota/resourcequota-compute.yaml
-kubectl apply -f manifests/resourcequota/resourcequota-objects.yaml
-kubectl apply -f manifests/resourcequota/deployment-with-quota.yaml
-
-echo "[apply] ----------------------------------------"
-echo "[apply] Aplicação concluída com sucesso."
+log "Aplicação concluída com sucesso."

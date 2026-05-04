@@ -1,30 +1,44 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "[setup] Iniciando verificações do ambiente Kubernetes..."
+SCRIPT_NAME="setup"
+
+log() {
+  echo "[${SCRIPT_NAME}] $*"
+}
+
+error() {
+  echo "[${SCRIPT_NAME}] ERRO: $*" >&2
+}
+
+warn() {
+  echo "[${SCRIPT_NAME}] ALERTA: $*"
+}
+
+log "Iniciando verificações do ambiente Kubernetes..."
 
 if ! command -v kubectl >/dev/null 2>&1; then
-  echo "[setup] ERRO: kubectl não está instalado."
+  error "kubectl não está instalado ou não está no PATH."
   exit 1
 fi
-echo "[setup] OK: kubectl encontrado."
+log "OK: kubectl encontrado."
 
 if ! command -v docker >/dev/null 2>&1; then
-  echo "[setup] ERRO: docker não está instalado."
+  error "docker não está instalado ou não está no PATH."
   exit 1
 fi
-echo "[setup] OK: docker encontrado."
+log "OK: docker encontrado."
 
 if ! kubectl cluster-info >/dev/null 2>&1; then
-  echo "[setup] ERRO: não foi encontrado um cluster Kubernetes acessível no contexto atual."
-  echo "[setup] Dica: verifique seu contexto com 'kubectl config get-contexts'."
+  error "não foi encontrado um cluster Kubernetes acessível no contexto atual."
+  log "Dica: verifique com 'kubectl config get-contexts' e 'kubectl config current-context'."
   exit 1
 fi
-echo "[setup] OK: cluster Kubernetes acessível."
+log "OK: cluster Kubernetes acessível."
 
 CURRENT_CONTEXT="$(kubectl config current-context 2>/dev/null || true)"
 if [[ -z "${CURRENT_CONTEXT}" ]]; then
-  echo "[setup] ERRO: não foi possível identificar o contexto atual."
+  error "não foi possível identificar o contexto atual."
   exit 1
 fi
 
@@ -33,6 +47,11 @@ if [[ -z "${CURRENT_NAMESPACE}" ]]; then
   CURRENT_NAMESPACE="default"
 fi
 
-echo "[setup] Contexto atual: ${CURRENT_CONTEXT}"
-echo "[setup] Namespace atual: ${CURRENT_NAMESPACE}"
-echo "[setup] Sucesso: ambiente pronto para aplicar os manifests do laboratório."
+log "Contexto atual: ${CURRENT_CONTEXT}"
+log "Namespace atual: ${CURRENT_NAMESPACE}"
+
+if [[ "${CURRENT_CONTEXT}" != *kind* && "${CURRENT_CONTEXT}" != *minikube* ]]; then
+  warn "o contexto atual não contém 'kind' nem 'minikube'. Confirme se está usando o cluster correto."
+fi
+
+log "Sucesso: ambiente pronto para aplicar os manifests do laboratório."
