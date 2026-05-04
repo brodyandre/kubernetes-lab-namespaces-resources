@@ -370,27 +370,28 @@ Esse comando valida a coleta de métricas de CPU e memória dos pods.
 
 ## O que um recrutador técnico avalia aqui
 
-- Capacidade de executar Kubernetes na prática, além da teoria
-- Organização de repositório com separação clara entre docs, manifests e scripts
-- Uso de infraestrutura como código com YAML versionado
-- Validação técnica com `kubectl get`, `kubectl describe`, `kubectl top` e testes de DNS interno
-- Noções de governança de recursos para ambientes compartilhados
-- Qualidade de comunicação técnica em documentação profissional
-- Uso de GitHub Actions, Pull Requests, Makefile e documentação auxiliar 
+Este projeto foi estruturado para demonstrar competências práticas que são valorizadas em posições de Engenharia de Dados, DevOps, Cloud e Kubernetes.
+
+| Competência avaliada | Como aparece neste projeto |
+|---|---|
+| Kubernetes na prática | O laboratório cria namespaces, pods, services, policies de recursos e valida comunicação interna no cluster |
+| Organização técnica | O repositório separa claramente documentação, manifests, scripts, assets e materiais de LinkedIn |
+| Infraestrutura como código | Os recursos Kubernetes são definidos em arquivos YAML versionados no GitHub |
+| Validação operacional | O projeto usa comandos como `kubectl get`, `kubectl describe`, `kubectl top` e testes de DNS interno |
+| Governança de recursos | O laboratório aplica `requests`, `limits`, `QoS`, `LimitRange` e `ResourceQuota` |
+| Automação local | Scripts Bash e `Makefile` facilitam setup, aplicação, validação e limpeza do laboratório |
+| Qualidade de entrega | O projeto inclui GitHub Actions, Pull Requests, templates, changelog, roadmap e documentação auxiliar |
+| Comunicação técnica | A documentação foi escrita para ser clara, didática e útil para recrutadores, pessoas técnicas e estudantes |
+
+Em resumo, este repositório demonstra não apenas conhecimento conceitual em Kubernetes, mas também capacidade de organizar, executar, validar e documentar um laboratório técnico de ponta a ponta.
 
 ## Evidências visuais do laboratório
 
-Esta seção documenta as capturas recomendadas para comprovar visualmente a execução prática do laboratório Kubernetes.
+As imagens abaixo comprovam visualmente a execução prática do laboratório Kubernetes no cluster local `kind-lab-ns-res`.
 
-As evidências devem ser geradas a partir de comandos executados localmente no cluster `kind-lab-ns-res` e salvas na pasta:
+Os prints foram gerados a partir de comandos reais executados no WSL2 com `kubectl`, `make` e GitHub.
 
-```bash
-assets/screenshots/
-```
-
-> Observação: as imagens ainda não foram adicionadas ao repositório. Por isso, esta seção lista os prints recomendados sem renderizar imagens quebradas no GitHub.
-
-| Evidência | Comando | Arquivo sugerido | O que comprova |
+| Evidência | Comando | Arquivo | O que comprova |
 |---|---|---|---|
 | Namespaces criados | `kubectl get namespaces` | `01-namespaces.png` | Separação lógica de ambientes e laboratórios no cluster |
 | Pods em execução | `kubectl get pods -A` | `02-pods-running.png` | Workloads ativos em múltiplos namespaces |
@@ -402,35 +403,41 @@ assets/screenshots/
 | Estrutura no VS Code | Captura da estrutura do projeto | `08-vscode-estrutura-projeto.png` | Organização profissional do repositório |
 | README no GitHub | Captura do README renderizado | `09-github-readme.png` | Apresentação visual do projeto para recrutadores |
 
-### Como adicionar os screenshots
-
-Após executar o laboratório localmente, salve os prints reais na pasta:
-
-```bash
-assets/screenshots/
-```
-
-Use os nomes sugeridos na tabela acima.
-
-Depois, adicione e envie as imagens para o GitHub:
-
-```bash
-git add assets/screenshots/
-git commit -m "docs: add laboratory screenshots"
-git push origin main
-```
-
-### Galeria futura
-
-Quando os arquivos `.png` forem adicionados ao repositório, esta seção poderá ser atualizada para exibir a galeria visual diretamente no README.
-
-Exemplo:
-
-```markdown
 ### Namespaces criados
 
 ![Namespaces criados](assets/screenshots/01-namespaces.png)
-```
+
+### Pods em execução
+
+![Pods em execução](assets/screenshots/02-pods-running.png)
+
+### Services criados
+
+![Services criados](assets/screenshots/03-services.png)
+
+### ResourceQuota aplicada
+
+![ResourceQuota aplicada](assets/screenshots/04-resourcequota.png)
+
+### LimitRange aplicada
+
+![LimitRange aplicada](assets/screenshots/05-limitrange.png)
+
+### Metrics Server coletando métricas
+
+![Metrics Server](assets/screenshots/06-metrics-server.png)
+
+### Comunicação DNS entre namespaces
+
+![DNS entre namespaces](assets/screenshots/07-dns-cross-namespace.png)
+
+### Estrutura do projeto no VS Code
+
+![Estrutura no VS Code](assets/screenshots/08-vscode-estrutura-projeto.png)
+
+### README renderizado no GitHub
+
+![README no GitHub](assets/screenshots/09-github-readme.png)
 
 ## Aprendizados demonstrados para recrutadores
 
