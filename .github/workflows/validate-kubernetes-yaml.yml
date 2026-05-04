@@ -1,0 +1,33 @@
+name: Validate Kubernetes YAML
+
+on:
+  push:
+    branches:
+      - main
+      - feature/melhorias-pos-publicacao
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  validate-manifests:
+    name: Validate manifests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install yamllint
+        run: |
+          python -m pip install --upgrade pip
+          pip install yamllint
+
+      - name: Validate YAML syntax in manifests
+        run: |
+          yamllint -d "{extends: default, rules: {line-length: disable, document-start: disable, indentation: disable}}" manifests/

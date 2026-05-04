@@ -64,6 +64,9 @@ Observação importante:
 O diretório `manifests/limitrange/` inclui o manifesto didático `pod-above-limit.yaml`.
 Por isso, ao executar `kubectl apply -f manifests/limitrange/`, pode aparecer erro esperado de validação no final da execução.
 
+Ao usar `scripts/apply-all.sh` ou `make apply`, esse arquivo didático **não** é aplicado automaticamente para evitar falha no fluxo principal.
+Para reproduzir o erro de forma controlada, aplique manualmente `pod-above-limit.yaml`.
+
 Leitura prática:
 
 - `kubectl apply -f manifests/limitrange/`

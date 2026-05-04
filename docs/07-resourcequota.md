@@ -81,6 +81,9 @@ Observação importante:
 O diretório `manifests/resourcequota/` inclui o manifesto didático `deployment-exceed-quota.yaml`.
 Por isso, ao executar `kubectl apply -f manifests/resourcequota/`, pode aparecer erro esperado de quota excedida no final da execução.
 
+Ao usar `scripts/apply-all.sh` ou `make apply`, esse arquivo didático **não** é aplicado automaticamente para manter o fluxo principal estável.
+Para reproduzir o erro de quota de forma controlada, aplique manualmente `deployment-exceed-quota.yaml`.
+
 Leitura prática:
 
 - `kubectl apply -f manifests/resourcequota/`
