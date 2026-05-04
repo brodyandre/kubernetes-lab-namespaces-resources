@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: resources-lab
+  labels:
+    environment: lab
+    app.kubernetes.io/part-of: kubernetes-lab-namespaces-resources
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-resources
+  namespace: resources-lab
+  labels:
+    app: nginx-resources
+    app.kubernetes.io/name: nginx-resources
+    app.kubernetes.io/part-of: kubernetes-lab-namespaces-resources
+    app.kubernetes.io/managed-by: kubectl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-resources
+  template:
+    metadata:
+      labels:
+        app: nginx-resources
+        app.kubernetes.io/name: nginx-resources
+        app.kubernetes.io/part-of: kubernetes-lab-namespaces-resources
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.27-alpine
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "256Mi"

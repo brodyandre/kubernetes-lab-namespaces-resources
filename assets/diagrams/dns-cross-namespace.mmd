@@ -1,0 +1,11 @@
+sequenceDiagram
+  participant P as Pod dns-client (dev)
+  participant D as CoreDNS
+  participant S as Service api-shared (shared)
+  participant B as Pod backend (shared)
+
+  P->>D: Consulta api-shared.shared.svc.cluster.local
+  D-->>P: Retorna ClusterIP do Service
+  P->>S: HTTP GET /
+  S->>B: Encaminha para backend
+  B-->>P: "api shared namespace"

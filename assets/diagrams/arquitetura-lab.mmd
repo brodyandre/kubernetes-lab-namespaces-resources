@@ -1,0 +1,13 @@
+flowchart LR
+  A[Workstation WSL2<br/>kubectl + Docker + kind/k3d/minikube] --> B[Cluster Kubernetes]
+  B --> C[Namespace dev]
+  B --> D[Namespace qa]
+  B --> E[Namespace shared]
+  C --> F[Pod/Deployment/Service]
+  D --> G[Pod/Deployment/Service]
+  E --> H[Service compartilhado]
+  F --> H
+  G --> H
+  B --> I[Policies de Recursos]
+  I --> J[LimitRange]
+  I --> K[ResourceQuota]

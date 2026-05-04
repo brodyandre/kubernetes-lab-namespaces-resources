@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-exceed-quota
+  namespace: quota-lab
+  labels:
+    app: nginx-exceed-quota
+    app.kubernetes.io/name: nginx-exceed-quota
+    app.kubernetes.io/part-of: kubernetes-lab-namespaces-resources
+    app.kubernetes.io/managed-by: kubectl
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx-exceed-quota
+  template:
+    metadata:
+      labels:
+        app: nginx-exceed-quota
+        app.kubernetes.io/name: nginx-exceed-quota
+        app.kubernetes.io/part-of: kubernetes-lab-namespaces-resources
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.27-alpine
+        resources:
+          requests:
+            cpu: "400m"
+            memory: "512Mi"
+          limits:
+            cpu: "800m"
+            memory: "1Gi"

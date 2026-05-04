@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-with-quota
+  namespace: quota-lab
+  labels:
+    app: nginx-with-quota
+    app.kubernetes.io/name: nginx-with-quota
+    app.kubernetes.io/part-of: kubernetes-lab-namespaces-resources
+    app.kubernetes.io/managed-by: kubectl
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx-with-quota
+  template:
+    metadata:
+      labels:
+        app: nginx-with-quota
+        app.kubernetes.io/name: nginx-with-quota
+        app.kubernetes.io/part-of: kubernetes-lab-namespaces-resources
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.27-alpine
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"

@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-burstable
+  namespace: qos-lab
+  labels:
+    app: pod-burstable
+    app.kubernetes.io/name: pod-burstable
+    app.kubernetes.io/part-of: kubernetes-lab-namespaces-resources
+    app.kubernetes.io/managed-by: kubectl
+spec:
+  containers:
+  - name: nginx
+    image: nginx:1.27-alpine
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "128Mi"
+      limits:
+        cpu: "300m"
+        memory: "256Mi"

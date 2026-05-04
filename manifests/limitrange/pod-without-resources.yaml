@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-without-resources
+  namespace: limitrange-lab
+  labels:
+    app: pod-without-resources
+    app.kubernetes.io/name: pod-without-resources
+    app.kubernetes.io/part-of: kubernetes-lab-namespaces-resources
+    app.kubernetes.io/managed-by: kubectl
+spec:
+  containers:
+  - name: nginx
+    image: nginx:1.27-alpine
